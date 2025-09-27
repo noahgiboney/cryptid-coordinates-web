@@ -1,0 +1,17 @@
+{
+    "applinks": {
+      "details": [
+        {
+          "appIDs": [
+            "94GUNU2NWX.com.noahgiboney.CryptidCoordinates"
+          ],
+          "components": [
+            {
+              "/": "/location/*",
+              "comment": "Matches any URL whose path starts with /location/"
+            }
+          ]
+        }
+      ]
+    }
+  }
