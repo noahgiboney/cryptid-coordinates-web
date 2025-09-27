@@ -1,0 +1,32 @@
+.page {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    font-family: Arial, sans-serif;
+    background: white;
+  }
+  
+  .main {
+    text-align: center;
+  }
+  
+  .logo {
+    margin-bottom: 20px;
+    width: 400px;
+    height: 400px;
+  }
+  
+  .motto {
+    font-size: 2rem;
+    margin: 20px 0;
+  }
+  
+  .appStoreButton {
+    margin-top: 20px;
+    transition: transform 0.3s ease;
+  }
+  
+  .appStoreButton:hover {
+    transform: scale(1.1);
+  }
