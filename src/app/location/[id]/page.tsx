@@ -9,14 +9,17 @@ type LocationPreview = {
 };
 
 type Props = {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const resolvedParams = await params;
+  const { id } = resolvedParams;
+
   const { data: location } = await supabase
     .from("locations") 
-    .select("id, name, detail, image_url")
-    .eq("id", params.id)
+    .select("id, name, detail, image_url as imageUrl")
+    .eq("id", id)
     .single() as { data: LocationPreview | null };
 
   if (!location) {
