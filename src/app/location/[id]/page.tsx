@@ -1,4 +1,53 @@
 import Image from "next/image";
+import { Metadata } from "next";
+import { supabase } from "@/lib/supabase"; 
+type LocationPreview = {
+  id: string;
+  name: string;
+  detail: string;
+  imageUrl: string;
+};
+
+type Props = {
+  params: { id: string };
+};
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { data: location } = await supabase
+    .from("locations") 
+    .select("id, name, detail, image_url")
+    .eq("id", params.id)
+    .single() as { data: LocationPreview | null };
+
+  if (!location) {
+    return {
+      title: "Location Not Found",
+    };
+  }
+
+  const title = location.name;
+  const description = location.detail.length > 160 
+    ? `${location.detail.slice(0, 160)}...` 
+    : location.detail;
+
+  return {
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      images: [location.imageUrl],
+      url: `https://cryptid-coordinates-web.vercel.app/location/${params.id}`,
+      type: "website",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: [location.imageUrl],
+    },
+  };
+}
 
 export default function LocationPage() {
   return (

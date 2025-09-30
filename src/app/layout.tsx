@@ -16,7 +16,7 @@ export const metadata: Metadata = {
   title: "Cryptid Coordinates",
   description: "Explore Haunted Locations",
   icons: {
-    icon: "/favicon_white.png",
+    icon: "/favicon_black.png",
   },
 };
 
