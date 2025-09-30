@@ -40,7 +40,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       title,
       description,
       images: [location.imageUrl],
-      url: `https://cryptid-coordinates-web.vercel.app/location/${params.id}`,
+      url: `https://cryptid-coordinates-web.vercel.app/location/${id}`,
       type: "website",
     },
     twitter: {
