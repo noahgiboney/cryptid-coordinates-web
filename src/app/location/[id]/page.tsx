@@ -1,11 +1,11 @@
 import Image from "next/image";
 import { Metadata } from "next";
 import { supabase } from "@/lib/supabase"; 
+
 type LocationPreview = {
   id: string;
   name: string;
   detail: string;
-  imageUrl: string;
 };
 
 type Props = {
@@ -13,49 +13,102 @@ type Props = {
 };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  console.log('generateMetadata: Starting metadata generation...');
+
   const resolvedParams = await params;
   const { id } = resolvedParams;
 
-  const { data: location } = await supabase
-    .from("locations") 
-    .select("id, name, detail, image_url as imageUrl")
-    .eq("id", id)
-    .single() as { data: LocationPreview | null };
+  console.log('generateMetadata: Resolved params - ID:', id);
 
-  if (!location) {
+  try {
+    console.log('generateMetadata: Executing Supabase query...'); 
+    const { data: location, error }: { data: LocationPreview | null; error: any } = await supabase
+      .from("locations")
+      .select("id, name, detail")
+      .eq("id", id)
+      .single();
+
+    console.log('generateMetadata: Supabase response - Data:', location, 'Error:', error);
+
+    if (error) {
+      console.error('generateMetadata: Supabase Error Details:', error.message, error.code);
+      if (error.code === 'PGRST116') { 
+        console.log('generateMetadata: No location found for ID:', id); 
+      }
+      return {
+        title: "Location Not Found",
+      };
+    }
+
+    if (!location) {
+      console.log('generateMetadata: No data returned (null) for ID:', id); // Debug: Null check
+      return {
+        title: "Location Not Found",
+      };
+    }
+
+    console.log('generateMetadata: Location data found:', { id: location.id, name: location.name }); // Debug: Success log
+
+    const title = location.name;
+    const description = location.detail.length > 160 
+      ? `${location.detail.slice(0, 160)}...` 
+      : location.detail;
+
+    console.log('generateMetadata: Generated title:', title, 'Description preview:', description.slice(0, 50) + '...'); // Debug: Output preview
+
+    const metadata: Metadata = {
+      title,
+      description,
+      openGraph: {
+        title,
+        description,
+        url: `https://cryptid-coordinates-web.vercel.app/location/${id}`,
+        type: "website",
+      },
+      twitter: {
+        card: "summary_large_image",
+        title,
+        description,
+      },
+    };
+
+    console.log('generateMetadata: Full metadata object:', metadata);
+    return metadata;
+
+  } catch (e) {
+    console.error('generateMetadata: Unexpected error:', e); // Debug: Catch-all
     return {
-      title: "Location Not Found",
+      title: "Error Loading Location",
     };
   }
-
-  const title = location.name;
-  const description = location.detail.length > 160 
-    ? `${location.detail.slice(0, 160)}...` 
-    : location.detail;
-
-  return {
-    title,
-    description,
-    openGraph: {
-      title,
-      description,
-      images: [location.imageUrl],
-      url: `https://cryptid-coordinates-web.vercel.app/location/${id}`,
-      type: "website",
-    },
-    twitter: {
-      card: "summary_large_image",
-      title,
-      description,
-      images: [location.imageUrl],
-    },
-  };
 }
 
-export default function LocationPage() {
-  return (
-    <main className="flex min-h-screen flex-col items-center justify-center gap-8">
-      <Image
+export default async function LocationPage({ params }: Props) {
+  const resolvedParams = await params;
+  const { id } = resolvedParams;
+
+  try {
+    const { data: location, error }: { data: LocationPreview | null; error: any } = await supabase
+      .from("locations")
+      .select("id, name, detail")
+      .eq("id", id)
+      .single();
+
+    if (error || !location) {
+      return (
+        <main className="flex min-h-screen flex-col items-center justify-center gap-8">
+          <p>Location not found</p>
+        </main>
+      );
+    }
+
+    const descPreview = location.detail.length > 100 
+      ? `${location.detail.slice(0, 100)}...` 
+      : location.detail;
+
+    return (
+      <main className="flex min-h-screen flex-col items-center justify-center gap-8 p-4 text-center">
+        <Image
         className="rounded-lg shadow-lg"
         src="/dark.png"
         alt="App Logo"
@@ -63,7 +116,10 @@ export default function LocationPage() {
         height={300}
         priority
       />
-      <a
+        <h1 className="text-2xl font-bold">{location.name}</h1>
+        <p className="text-lg max-w-md">{descPreview}</p>
+        <p className="text-gray-400">View more on the app</p>
+        <a
           href="https://apps.apple.com/us/app/cryptid-coordinates/id6478195420"
           target="_blank"
           rel="noopener noreferrer"
@@ -76,6 +132,14 @@ export default function LocationPage() {
             height={50}
           />
         </a>
-    </main>
-  );
+      </main>
+    );
+  } catch (e) {
+    console.error('LocationPage: Unexpected error:', e);
+    return (
+      <main className="flex min-h-screen flex-col items-center justify-center gap-8">
+        <p>Error loading location</p>
+      </main>
+    );
+  }
 }
