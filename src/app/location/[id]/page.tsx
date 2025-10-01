@@ -51,31 +51,34 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     console.log('generateMetadata: Location data found:', { id: location.id, name: location.name });
 
     const title = location.name;
-    const description = location.detail.length > 160 
+    const description = location.detail.length > 100 
       ? `${location.detail.slice(0, 160)}...` 
       : location.detail;
 
     console.log('generateMetadata: Generated title:', title, 'Description preview:', description.slice(0, 50) + '...');
 
+    const siteUrl = 'https://cryptid-coordinates-web.vercel.app';
+
     const metadata: Metadata = {
       title,
-      description,
+      description, 
       openGraph: {
         title,
         description,
-        url: `https://cryptid-coordinates-web.vercel.app/location/${id}`,
-        type: "website",
+        siteName: 'Cryptid Coordinates', 
+        url: `${siteUrl}/location/${id}`,
+        type: 'website',
         images: [
           {
             url: location.image_url,
-            width: 1200,  // Recommended OG image width
-            height: 630,  // Recommended OG image height
+            width: 1200,
+            height: 630,
             alt: title,
           },
         ],
       },
       twitter: {
-        card: "summary_large_image",
+        card: 'summary_large_image',
         title,
         description,
       },
