@@ -64,11 +64,20 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
         description,
         url: `https://cryptid-coordinates-web.vercel.app/location/${id}`,
         type: "website",
+        images: [
+          {
+            url: 'https://cryptid-coordinates-web.vercel.app/dark.png', // Absolute URL to your image
+            width: 300,
+            height: 300,
+            alt: title, // Good for accessibility
+          },
+        ],
       },
       twitter: {
         card: "summary_large_image",
         title,
         description,
+        images: ['https://cryptid-coordinates-web.vercel.app/dark.png'], // Matches OG for consistency
       },
     };
 
