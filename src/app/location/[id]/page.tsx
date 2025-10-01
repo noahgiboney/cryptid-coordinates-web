@@ -41,20 +41,20 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     }
 
     if (!location) {
-      console.log('generateMetadata: No data returned (null) for ID:', id); 
+      console.log('generateMetadata: No data returned (null) for ID:', id);
       return {
         title: "Location Not Found",
       };
     }
 
-    console.log('generateMetadata: Location data found:', { id: location.id, name: location.name }); 
+    console.log('generateMetadata: Location data found:', { id: location.id, name: location.name });
 
     const title = location.name;
     const description = location.detail.length > 160 
       ? `${location.detail.slice(0, 160)}...` 
       : location.detail;
 
-    console.log('generateMetadata: Generated title:', title, 'Description preview:', description.slice(0, 50) + '...'); 
+    console.log('generateMetadata: Generated title:', title, 'Description preview:', description.slice(0, 50) + '...');
 
     const metadata: Metadata = {
       title,
@@ -64,20 +64,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
         description,
         url: `https://cryptid-coordinates-web.vercel.app/location/${id}`,
         type: "website",
-        images: [
-          {
-            url: 'https://cryptid-coordinates-web.vercel.app/dark.png',
-            width: 300,
-            height: 300,
-            alt: title,
-          },
-        ],
       },
       twitter: {
         card: "summary_large_image",
         title,
         description,
-        images: ['https://cryptid-coordinates-web.vercel.app/dark.png'],
       },
     };
 
