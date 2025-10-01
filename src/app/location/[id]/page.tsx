@@ -6,6 +6,7 @@ type LocationPreview = {
   id: string;
   name: string;
   detail: string;
+  image_url: string;
 };
 
 type Props = {
@@ -24,7 +25,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     console.log('generateMetadata: Executing Supabase query...'); 
     const { data: location, error }: { data: LocationPreview | null; error: any } = await supabase
       .from("locations")
-      .select("id, name, detail")
+      .select("id, name, detail, image_url")
       .eq("id", id)
       .single();
 
@@ -64,6 +65,14 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
         description,
         url: `https://cryptid-coordinates-web.vercel.app/location/${id}`,
         type: "website",
+        images: [
+          {
+            url: location.image_url,
+            width: 1200,  // Recommended OG image width
+            height: 630,  // Recommended OG image height
+            alt: title,
+          },
+        ],
       },
       twitter: {
         card: "summary_large_image",
@@ -76,7 +85,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     return metadata;
 
   } catch (e) {
-    console.error('generateMetadata: Unexpected error:', e); // Debug: Catch-all
+    console.error('generateMetadata: Unexpected error:', e); 
     return {
       title: "Error Loading Location",
     };
